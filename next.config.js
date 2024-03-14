@@ -8,12 +8,6 @@ const withPWA = require("next-pwa")({
 });
 
 const nextConfig = withPWA({
-  rewrites: () => [
-    {
-      source: "/post",
-      destination: "http://geodb.uos.ac.kr/api/driver/post/survey",
-    },
-  ],
   reactStrictMode: false,
   output: "standalone",
   productionBrowserSourceMaps: false,
@@ -44,4 +38,12 @@ const nextConfig = withPWA({
   },
 });
 
-module.exports = nextConfig;
+module.exports = {
+  ...nextConfig,
+  rewrites: () => [
+    {
+      source: "/post",
+      destination: "http://geodb.uos.ac.kr/api/driver/post/survey",
+    },
+  ],
+};

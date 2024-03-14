@@ -38,12 +38,14 @@ const nextConfig = withPWA({
   },
 });
 
-module.exports = nextConfig;
-// async rewrites() {
-//   return [
-//     {
-//       source: "/:start/:end",
-//       destination: `${process.env.NEXT_PUBLIC_API_ROOT}/:start/:end`,
-//     },
-//   ];
-// },
+module.exports = {
+  ...nextConfig,
+  async rewrites() {
+    return [
+      {
+        source: "/:start/:end",
+        destination: `${process.env.NEXT_PUBLIC_API_ROOT}/:start/:end`,
+      },
+    ];
+  },
+};

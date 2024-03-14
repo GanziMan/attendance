@@ -38,12 +38,12 @@ const nextConfig = withPWA({
   },
 });
 
-module.exports = {
-  ...nextConfig,
-  rewrites: () => [
-    {
-      source: "/post",
-      destination: "http://geodb.uos.ac.kr/api/driver/post/survey",
-    },
-  ],
-};
+module.exports = nextConfig;
+// async rewrites() {
+//   return [
+//     {
+//       source: "/:start/:end",
+//       destination: `${process.env.NEXT_PUBLIC_API_ROOT}/:start/:end`,
+//     },
+//   ];
+// },

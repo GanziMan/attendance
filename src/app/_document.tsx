@@ -21,11 +21,12 @@ export default function MyDocument({ emotionStyleTags }: MyDocumentProps) {
       <Head>
         {/* PWA primary color */}
         <link rel="shortcut icon" href="/favicon.ico" />
-        <meta name="emotion-insertion-point" content="" />
         <meta
+          name="emotion-insertion-point"
           httpEquiv="Content-Security-Policy"
           content="upgrade-insecure-requests"
         />
+
         <link rel="manifest" href="/manifest.json" />
         {/* <link
           rel="stylesheet preload"

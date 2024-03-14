@@ -1,14 +1,22 @@
 /** @type {import('next').NextConfig} */
 
-const withPWA = require("next-pwa")({
-  dest: "public",
-  disable: process.env.NODE_ENV === "development",
-  scope: "/",
-  sw: "service-worker.js",
-});
+// const withPWA = require("next-pwa")({
+//   dest: "public",
+//   disable: process.env.NODE_ENV === "development",
+//   scope: "/",
+//   sw: "service-worker.js",
+// });
 
-const nextConfig = withPWA({
-  reactStrictMode: false,
+const nextConfig = {
+  reactStrictMode: true,
+  async rewrites() {
+    return [
+      {
+        source: "/:start/:end",
+        destination: `${process.env.NEXT_PUBLIC_API_ROOT}/:start/:end`,
+      },
+    ];
+  },
   output: "standalone",
   productionBrowserSourceMaps: false,
   experimental: {
@@ -36,16 +44,6 @@ const nextConfig = withPWA({
     });
     return config;
   },
-});
-
-module.exports = {
-  ...nextConfig,
-  async rewrites() {
-    return [
-      {
-        source: "/:start/:end",
-        destination: `${process.env.NEXT_PUBLIC_API_ROOT}/:start/:end`,
-      },
-    ];
-  },
 };
+
+module.exports = nextConfig;

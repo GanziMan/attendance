@@ -138,11 +138,11 @@ const Index = () => {
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell>이름</TableCell>
-                <TableCell>나이</TableCell>
-                <TableCell>휴대폰번호</TableCell>
-                <TableCell>서브휴대폰번호</TableCell>
-                {/* <TableCell>스케줄</TableCell> */}
+                <TableCell width={"20%"}>이름</TableCell>
+                <TableCell width={"20%"}>나이</TableCell>
+                <TableCell width={"20%"}>휴대폰번호</TableCell>
+                <TableCell width={"20%"}>서브휴대폰번호</TableCell>
+                <TableCell width={"20%"}>비고</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -162,9 +162,15 @@ const Index = () => {
                   <TableCell component="th" scope="row">
                     {item.age}
                   </TableCell>
-                  <TableCell>{item.mobileNumber}</TableCell>
-                  <TableCell>{item.subMobileNumber}</TableCell>
-                  {/* <TableCell>{item.description}</TableCell> */}
+                  <TableCell component="th" scope="row">
+                    {item.mobileNumber}
+                  </TableCell>
+                  <TableCell component="th" scope="row">
+                    {item.subMobileNumber}
+                  </TableCell>
+                  <TableCell component="th" scope="row">
+                    {item.description}
+                  </TableCell>
                 </TableRow>
               ))}
               <TableRow
@@ -213,17 +219,21 @@ const Index = () => {
                         }
                       />
                     </TableCell>
-                    {/* <TableCell component="th" scope="row">
+                    <TableCell component="th" scope="row">
                       <Button
                         variant="contained"
                         color="primary"
                         onClick={() => {
                           setOpen(true);
                         }}
+                        sx={{
+                          height: "auto",
+                          fontSize: "inherit",
+                        }}
                       >
-                        스케줄
+                        스케줄 지정
                       </Button>
-                    </TableCell> */}
+                    </TableCell>
                   </>
                 ) : (
                   <TableCell
@@ -243,8 +253,13 @@ const Index = () => {
           </Table>
         </TableContainer>
 
-        <Dialog open={open} onClose={() => setOpen(false)} fullWidth>
-          <ClassScheduleContainer />
+        <Dialog
+          open={open}
+          onClose={() => setOpen(false)}
+          fullWidth
+          maxWidth={false}
+        >
+          <ClassScheduleContainer setOpen={setOpen} />
         </Dialog>
         {isCreate ? (
           <div style={{ display: "flex", gap: "10px" }}>

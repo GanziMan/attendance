@@ -28,12 +28,7 @@ export default function MyDocument({ emotionStyleTags }: MyDocumentProps) {
         />
 
         <link rel="manifest" href="/manifest.json" />
-        {/* <link
-          rel="stylesheet preload"
-          as="style"
-          crossOrigin=""
-          href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_four@1.2/JalnanOTF00.woff"
-        /> */}
+
         {emotionStyleTags}
       </Head>
       <body>

@@ -26,7 +26,11 @@ const INITIAL_SCHEDULES: Record<string, boolean>[] = [
 
 const WEEKDAYS = [1, 2, 3, 4, 5, 6, 0];
 
-export default function ClassScheduleContainer() {
+interface IProps {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+export default function ClassScheduleContainer(props: IProps) {
+  const { setOpen } = props;
   const { t } = useTranslation();
   const [schedules, setSchedules] = useState(INITIAL_SCHEDULES);
   const [schedulesFix, setSchedulesFix] = useState(INITIAL_SCHEDULES);
@@ -82,7 +86,7 @@ export default function ClassScheduleContainer() {
             </li>
           </BoxSTnotice>
           <BoxSTbuttonGroup>
-            <ButtonST variant="outlined" onClick={reset}>
+            <ButtonST variant="outlined" onClick={() => setOpen(false)}>
               취소
             </ButtonST>
             <ButtonST variant="contained" onClick={save} disabled={isEqual}>

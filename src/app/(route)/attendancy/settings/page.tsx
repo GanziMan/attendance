@@ -10,6 +10,7 @@ import Stack from "@mui/material/Stack";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { pushNotification } from "@/app/utils/notification";
+import { removeLocalStorage } from "@/libs/client/utils";
 
 const index = () => {
   const router = useRouter();
@@ -36,7 +37,9 @@ const index = () => {
         {/* 쿠키처리 수정 필요! */}
         <Button
           onClick={() => {
-            Cookies.remove("access-token");
+            Cookies.remove("ACCESS_TOKEN");
+            Cookies.remove("REFRESH_TOKEN");
+            removeLocalStorage("ACCESS_TOKEN");
             pushNotification("로그아웃 되었습니다.", "success");
             router.push("/");
           }}

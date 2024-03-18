@@ -75,10 +75,6 @@ const CommonTable: React.FC<CommonTableProps> = ({
 
   const { mutate } = useMutation(fetchListCreate, {
     onSuccess: (data) => {
-      Cookies.set("access-token", data.access_token);
-      axios.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${data.access_token}`;
       pushNotification("생성 되었습니다.", "success");
       setIsCreate(false);
       router.prefetch("/attendancy/list");

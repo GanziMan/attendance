@@ -8,6 +8,8 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { API_BASE_URL, accessToken } from "@/app/utils/common";
 import { pushNotification } from "./utils/notification";
+import { setTokens } from "@/libs/client/auth";
+import { setLocalStorage } from "@/libs/client/utils";
 
 export interface Login {
   username: string;
@@ -37,14 +39,18 @@ const index = () => {
         }
       );
 
-      const token = response.data.access_token;
+      const token = response.data.data!.accessToken;
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-      Cookies.set("access-token", response.data.access_token);
+      setLocalStorage("ACCESS_TOKEN", token);
+      setTokens({
+        accessToken: response.data.data!.accessToken,
+        refreshToken: response.data.data!.refreshToken,
+      });
 
       // 로그인 성공 시 반환
       return response;
     } catch (error) {
+      //
       // 오류 처리
       console.error("Error occurred during login:", error);
       throw error;

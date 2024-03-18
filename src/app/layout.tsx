@@ -1,21 +1,20 @@
 "use client";
 import Providers from ".";
 import "./globals.css";
-import { useRouter } from "next/navigation";
-import { accessToken } from "./utils/common";
 import { useEffect } from "react";
+import { setInterceptor } from "@/libs/client/utils";
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const router = useRouter();
-
   useEffect(() => {
-    if (accessToken === undefined) {
-      router.push("/");
+    const token = localStorage.getItem("ACCESS_TOKEN");
+    if (token) {
+      setInterceptor(token);
     }
-  }, [accessToken]);
+  }, []);
+
   return (
     <html lang="en">
       <body>

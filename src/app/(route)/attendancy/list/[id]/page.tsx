@@ -1,7 +1,7 @@
 "use client";
 
-import { Box, Button } from "@mui/material";
-import React from "react";
+import { Box, Button, CircularProgress } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import BasicLayout from "@/app/components/BasicLayout";
 import Paper from "@mui/material/Paper";
 // Component
@@ -19,6 +19,7 @@ import { API_BASE_URL, accessToken } from "@/app/utils/common";
 import { pushNotification } from "@/app/utils/notification";
 import dayjs from "dayjs";
 import "dayjs/locale/ko"; // 한국어 locale 설정
+import { LoadingComponent } from "@/app/components/Loading";
 
 interface DateFormat {
   dateFormat: {
@@ -73,10 +74,10 @@ const koreanDaysOfWeek: Record<string, string> = {
   FRIDAY: "금요일",
   SATURDAY: "토요일",
 };
+
 const index = () => {
   const router = useRouter();
   const params = useParams<{ id: string; description: string }>();
-  console.log(params);
   const todayFormatted: DateFormat = getFormattedDate();
   const queryClient = useQueryClient();
   const today = dayjs();
@@ -84,7 +85,7 @@ const index = () => {
   // 오늘의 날짜를 지정된 형식으로 포맷팅
   const todayFormat = today.format("YYYY년 MM월 DD일 (ddd)");
 
-  const { data, refetch } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["dashboard-data"],
     queryFn: async () => {
       const response = await axios.get(
@@ -94,7 +95,6 @@ const index = () => {
     },
   });
 
-  console.log(data);
   const fetchRecord = async (attendeeId: string) =>
     await axios.post(`${API_BASE_URL}/records`, {
       attendanceId: params.id,
@@ -129,87 +129,97 @@ const index = () => {
       pushNotification("오류 관리자에게 문의하세요.", "error");
     },
   });
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   return (
     <BasicLayout>
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableBody></TableBody>
-        </Table>
-      </TableContainer>
-      <br />
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell align="center" colSpan={5}>
-                교회1 충무교회 청년부 주말 30
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell align="center" colSpan={5}>
-                {todayFormat} 출석 대상자 {data?.length}명
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell align="center">이름</TableCell>
-              <TableCell align="center">출석 상태</TableCell>
-              <TableCell align="center">지각</TableCell>
-              <TableCell align="center">등원시간</TableCell>
-              <TableCell align="center">비고</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data ? (
-              data?.map((item: any) => (
-                <TableRow
-                  key={item.id}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                  hover
-                  style={{ cursor: "pointer" }}
-                >
-                  <TableCell component="th" align="center" scope="row">
-                    {item.id}
+      {isClient ? (
+        <>
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <TableBody></TableBody>
+            </Table>
+          </TableContainer>
+          <br />
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell align="center" colSpan={5}>
+                    교회1 충무교회 청년부 주말 30
                   </TableCell>
-                  <TableCell component="th" align="center" scope="row">
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      onClick={() => mutate(data.attendeeId)}
-                    >
-                      출석
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      color="warning"
-                      onClick={() => mutate(data.attendeeId)}
-                    >
-                      지각
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      onClick={() => mutate(data.attendeeId)}
-                    >
-                      결석
-                    </Button>
+                </TableRow>
+                <TableRow>
+                  <TableCell align="center" colSpan={5}>
+                    {todayFormat} 출석 대상자 {data?.length}명
                   </TableCell>
-                  <TableCell align="center">{item.email}</TableCell>
-                  <TableCell align="center">
-                    {koreanDaysOfWeek[item.day] + " "}
-                    {formatTime(item.time)}
-                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell align="center">이름</TableCell>
+                  <TableCell align="center">출석 상태</TableCell>
+                  <TableCell align="center">지각</TableCell>
+                  <TableCell align="center">등원시간</TableCell>
                   <TableCell align="center">비고</TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableCell align="center" colSpan={5}>
-                조회된 데이터가 없습니다.
-              </TableCell>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+              </TableHead>
+              <TableBody>
+                {data ? (
+                  data?.map((item: any) => (
+                    <TableRow
+                      key={item.id}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                      hover
+                      style={{ cursor: "pointer" }}
+                    >
+                      <TableCell component="th" align="center" scope="row">
+                        {item.id}
+                      </TableCell>
+                      <TableCell component="th" align="center" scope="row">
+                        <Button
+                          variant="outlined"
+                          color="primary"
+                          onClick={() => mutate(data.attendeeId)}
+                        >
+                          출석
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          color="warning"
+                          onClick={() => mutate(data.attendeeId)}
+                        >
+                          지각
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          onClick={() => mutate(data.attendeeId)}
+                        >
+                          결석
+                        </Button>
+                      </TableCell>
+                      <TableCell align="center">{item.email}</TableCell>
+                      <TableCell align="center">
+                        {koreanDaysOfWeek[item.day] || "" + " "}
+                        {formatTime(item.time)}
+                      </TableCell>
+                      <TableCell align="center">비고</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableCell align="center" colSpan={5}>
+                    {LoadingComponent(isLoading) ||
+                      "조회된 데이터가 없습니다. "}
+                  </TableCell>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </>
+      ) : null}
       <Box mt={2} display={"flex"} justifyContent={"space-between"}>
         <Button
           variant="contained"

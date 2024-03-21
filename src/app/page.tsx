@@ -1,15 +1,24 @@
 "use client";
 
-import { Box, Button, CircularProgress, Grid, TextField } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import Cookies from "js-cookie";
+import {
+  Box,
+  Button,
+  Checkbox,
+  CircularProgress,
+  Container,
+  CssBaseline,
+  Grid,
+  TextField,
+  Typography,
+} from "@mui/material";
+import React, { useState } from "react";
+
+import AuthApiClient from "@/clients/AuthApiClient";
 import axios from "axios";
-import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { API_BASE_URL, accessToken } from "@/app/utils/common";
 import { pushNotification } from "./utils/notification";
 import { setTokens } from "@/libs/client/auth";
-import { setLocalStorage } from "@/libs/client/utils";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 export interface Login {
   username: string;
@@ -28,20 +37,13 @@ const index = () => {
     const { username, password } = params;
 
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/auth/signin`,
-        {
-          username: username,
-          password: password,
-        },
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      const response = await AuthApiClient.getInstance().userLogin({
+        username: username,
+        password: password,
+      });
 
       const token = response.data.data!.accessToken;
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      setLocalStorage("ACCESS_TOKEN", token);
       setTokens({
         accessToken: response.data.data!.accessToken,
         refreshToken: response.data.data!.refreshToken,
@@ -83,62 +85,56 @@ const index = () => {
   }
 
   return (
-    <>
-      <Box>
-        <Grid container spacing={1} alignItems={"center"}>
-          <Grid item xs={12} textAlign={"center"} marginBottom={"20px"}>
-            <Button fullWidth variant="contained">
-              출석이 로그인
-            </Button>
-          </Grid>
-          <Grid item xs={5}>
-            <div>ID</div>
-          </Grid>
-          <Grid item xs={7}>
-            <TextField
-              variant="outlined"
-              value={login?.username}
-              // disabled={isUpdate ? false : true}
-              fullWidth
-              onChange={(e) => onChange("username", e.target.value)}
-            />
-          </Grid>
+    <Container component="main" maxWidth="xs">
+      <CssBaseline />
+      <Box
+        sx={{
+          marginTop: 8,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        {/* <Avatar sx={{ m: 1 }}>
+            <LockOutlinedIcon />
+          </Avatar> */}
+        <Typography component="h1" variant="h5">
+          체쿠리
+        </Typography>
+        <Box component="form" noValidate sx={{ mt: 1 }}>
+          <TextField
+            variant="outlined"
+            value={login?.username}
+            // disabled={isUpdate ? false : true}
+            fullWidth
+            label="아이디"
+            onChange={(e) => onChange("username", e.target.value)}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="비밀번호"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+            onChange={(e) => onChange("password", e.target.value)}
+          />
 
-          <Grid item xs={5}>
-            <div>PW</div>
-          </Grid>
-          <Grid item xs={7}>
-            <TextField
-              variant="outlined"
-              type="password"
-              value={login?.password}
-              fullWidth
-              onChange={(e) => onChange("password", e.target.value)}
-            />
-          </Grid>
-        </Grid>
-        <Box mt={3} display={"flex"} justifyContent={"flex-end"} gap={"5px"}>
           <Button
+            fullWidth
             variant="contained"
-            color="primary"
+            sx={{ mt: 3, mb: 2 }}
             onClick={() => {
               mutate(login);
             }}
           >
             로그인
           </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => {
-              router.push("/auth/register");
-            }}
-          >
-            회원가입
-          </Button>
         </Box>
       </Box>
-    </>
+    </Container>
   );
 };
 

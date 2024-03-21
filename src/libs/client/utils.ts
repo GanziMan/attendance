@@ -137,6 +137,5 @@ export const isArrayWithUndefined = (arr?: any[]) => {
 };
 export const setInterceptor = (token: string) => {
   if (!token) return false;
-  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   return true;
 };

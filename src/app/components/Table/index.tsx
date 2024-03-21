@@ -1,3 +1,4 @@
+import { API_BASE_URL, accessToken } from "@/app/utils/common";
 import {
   Button,
   FormControlLabel,
@@ -7,10 +8,11 @@ import {
 } from "@mui/material";
 // Libraries
 import React, { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import AddIcon from "@mui/icons-material/Add";
+import Cookies from "js-cookie";
 import Paper from "@mui/material/Paper";
-
 // Component
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -19,11 +21,8 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import axios from "axios";
-import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
-import { API_BASE_URL, accessToken } from "@/app/utils/common";
 import { pushNotification } from "@/app/utils/notification";
+import { useRouter } from "next/navigation";
 
 interface Info {
   attendanceId: number;
@@ -54,6 +53,7 @@ const CommonTable: React.FC<CommonTableProps> = ({
   isCreate,
   setIsCreate,
 }) => {
+  const queryClinet = useQueryClient();
   const router = useRouter();
   const [listCreate, setListCreate] = useState<listCreate>({
     title: "",
@@ -75,12 +75,12 @@ const CommonTable: React.FC<CommonTableProps> = ({
 
   const { mutate } = useMutation(fetchListCreate, {
     onSuccess: (data) => {
+      queryClinet.invalidateQueries({ queryKey: ["attendancy-list"] });
       pushNotification("생성 되었습니다.", "success");
       setIsCreate(false);
       router.prefetch("/attendancy/list");
     },
     onError: () => {
-      alert("빈칸을 전부 채워주세요");
       pushNotification("빈칸을 전부 채워주세요", "warning");
     },
   });

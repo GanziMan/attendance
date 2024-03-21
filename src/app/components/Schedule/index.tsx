@@ -6,56 +6,33 @@ import {
   Typography,
   styled,
 } from "@mui/material";
-import { Fragment, useState } from "react";
 
+import { Fragment } from "react";
 import ScheduleCheckGroup from "./components/ScheduleCheckGroup";
 import dayjs from "dayjs";
-
-import { toast } from "react-toastify";
-
 import { useTranslation } from "react-i18next";
-const INITIAL_SCHEDULES: Record<string, boolean>[] = [
-  {},
-  {},
-  {},
-  {},
-  {},
-  {},
-  {},
-];
 
 const WEEKDAYS = [1, 2, 3, 4, 5, 6, 0];
 
 interface IProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  schedules: Record<string, boolean>[];
+  setSchedules: React.Dispatch<React.SetStateAction<Record<string, boolean>[]>>;
 }
 export default function ClassScheduleContainer(props: IProps) {
-  const { setOpen } = props;
+  const { setOpen, schedules, setSchedules } = props;
   const { t } = useTranslation();
-  const [schedules, setSchedules] = useState(INITIAL_SCHEDULES);
-  const [schedulesFix, setSchedulesFix] = useState(INITIAL_SCHEDULES);
 
   const applyDate = dayjs().add(1, "day").format(t("YYYY년 MM월 DD일")); // TODO: 서버에서 가져오기
-  // 일정 서버 데이터로 되돌리기
-  const reset = () => {
-    toast.warn("기존에 선택된 일정대로 초기화 되었습니다.");
-  };
+
   const save = () => {};
-  const isEqual = schedules.every((obj, index) => {
-    const keysSchedules = Object.keys(obj);
-    const keysSchedulesFix = Object.keys(schedulesFix[index]);
-    if (keysSchedules.length !== keysSchedulesFix.length) {
-      return false;
-    }
-    return keysSchedules.every((key) => obj[key] === schedulesFix[index][key]);
-  });
 
   return (
     <BoxSTwrapper>
       <ContainerST>
         <BoxSTplannerWrapper>
           <BoxSTapplyDate>
-            <TypographSTapplyDate>{t("적용일")}</TypographSTapplyDate>
+            <TypographSTapplyDate>{t("현재날짜:")}</TypographSTapplyDate>
             <TypographSTapplyDate>{applyDate}</TypographSTapplyDate>
           </BoxSTapplyDate>
           <BoxSTschedulerGrid>
@@ -63,10 +40,10 @@ export default function ClassScheduleContainer(props: IProps) {
               <Fragment key={weekday}>
                 <ScheduleCheckGroup
                   weekday={weekday}
-                  hours={schedules[weekday]}
+                  hours={schedules![weekday]}
                   onChangeHours={(newHours) => {
                     setSchedules(
-                      schedules.map((h, i) => (i === weekday ? newHours : h))
+                      schedules!.map((h, i) => (i === weekday ? newHours : h))
                     );
                   }}
                 />
@@ -74,22 +51,12 @@ export default function ClassScheduleContainer(props: IProps) {
               </Fragment>
             ))}
           </BoxSTschedulerGrid>
-          <BoxSTnotice component="ul">
-            <li>{t("공휴일은 자동으로 수업 일정에서 제거됩니다.")}</li>
-            <li>
-              {t(
-                "일정 변경은 매달 1번만 가능하며, 상단에 표시된 적용 기간까지 반영됩니다. (*분기 단위로 자동 갱신)"
-              )}
-            </li>
-            <li>
-              {t("완료했거나 예정된 수업일정은 수업현황 메뉴에서 확인하세요.")}
-            </li>
-          </BoxSTnotice>
+
           <BoxSTbuttonGroup>
             <ButtonST variant="outlined" onClick={() => setOpen(false)}>
               취소
             </ButtonST>
-            <ButtonST variant="contained" onClick={save} disabled={isEqual}>
+            <ButtonST variant="contained" onClick={save}>
               확인
             </ButtonST>
           </BoxSTbuttonGroup>

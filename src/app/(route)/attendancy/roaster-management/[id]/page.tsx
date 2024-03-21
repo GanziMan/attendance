@@ -234,7 +234,10 @@ const Index = () => {
                         variant="outlined"
                         value={roaster?.subMobileNumber}
                         onChange={(e) =>
-                          onChange("subMobileNumber", e.target.value)
+                          onChange(
+                            "subMobileNumber",
+                            parsingPhoneNumber(e.target.value)
+                          )
                         }
                       />
                     </TableCell>

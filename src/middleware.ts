@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { safeJwtDecode } from "./libs/server/jwt";
 
 const ACCESS_TOKEN_KEY = "ACCESS_TOKEN";
@@ -31,7 +32,7 @@ export default async function handler(req: NextRequest) {
   }
 
   // 토큰 만료시 (refresh)
-  const decoded = await safeJwtDecode(String(accessToken));
+  const decoded = await safeJwtDecode(String(accessToken?.value));
   if (decoded?.exp != null && decoded.exp * 1000 <= Date.now()) {
     if (refreshToken != null) {
       try {

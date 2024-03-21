@@ -20,4 +20,4 @@ export const DateUtil = ({ url }: { url: string }) => {
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_ROOT;
 
-export const accessToken = Cookies.get("ACESS_TOKEN");
+export const accessToken = Cookies.get("ACCESS_TOKEN");

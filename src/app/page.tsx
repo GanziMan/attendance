@@ -3,11 +3,9 @@
 import {
   Box,
   Button,
-  Checkbox,
   CircularProgress,
   Container,
   CssBaseline,
-  Grid,
   TextField,
   Typography,
 } from "@mui/material";
@@ -80,10 +78,6 @@ const index = () => {
     }));
   };
 
-  if (isLoading || sessionLoading) {
-    return <CircularProgress color="inherit" />;
-  }
-
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -95,9 +89,6 @@ const index = () => {
           alignItems: "center",
         }}
       >
-        {/* <Avatar sx={{ m: 1 }}>
-            <LockOutlinedIcon />
-          </Avatar> */}
         <Typography component="h1" variant="h5">
           체쿠리
         </Typography>
@@ -105,7 +96,6 @@ const index = () => {
           <TextField
             variant="outlined"
             value={login?.username}
-            // disabled={isUpdate ? false : true}
             fullWidth
             label="아이디"
             onChange={(e) => onChange("username", e.target.value)}
@@ -121,7 +111,6 @@ const index = () => {
             autoComplete="current-password"
             onChange={(e) => onChange("password", e.target.value)}
           />
-
           <Button
             fullWidth
             variant="contained"

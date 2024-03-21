@@ -9,14 +9,13 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-
-import BasicLayout from "@/app/components/BasicLayout";
-import AddIcon from "@mui/icons-material/Add";
-import Paper from "@mui/material/Paper";
-import axios from "axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
+
+import BasicLayout from "@/app/components/BasicLayout";
+import ClassScheduleContainer from "@/app/components/Schedule";
+import Paper from "@mui/material/Paper";
+import ScheduleApiClient from "@/clients/ScheduleApiClient";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -24,10 +23,8 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { TextField } from "@mui/material";
-
-import ClassScheduleContainer from "@/app/components/Schedule";
-import { API_BASE_URL, accessToken } from "@/app/utils/common";
 import { pushNotification } from "@/app/utils/notification";
+import { useState } from "react";
 
 interface RoasterData {
   name: string;
@@ -38,15 +35,26 @@ interface RoasterData {
   attendanceId: string;
 }
 
+const INITIAL_SCHEDULES: Record<string, boolean>[] = [
+  {},
+  {},
+  {},
+  {},
+  {},
+  {},
+  {},
+];
+
 const Index = () => {
+  const theme = useTheme();
   const router = useRouter();
   const params = useParams<{ id: string }>();
-  const theme = useTheme();
+
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [isCreate, setIsCreate] = useState<boolean>(false);
-  const [roaster, setRoaster] = useState<RoasterData>({
+  const [roaster, setRoaster] = useState({
     name: "",
     age: "",
     mobileNumber: "",
@@ -54,6 +62,8 @@ const Index = () => {
     description: "",
     attendanceId: params.id,
   });
+
+  const [schedules, setSchedules] = useState(INITIAL_SCHEDULES);
 
   // Hook
   const onChange = (field: string, value: string | any) => {
@@ -64,51 +74,39 @@ const Index = () => {
   };
 
   const fetchScheduleCreate = async (data: any) => {
-    const response = await axios.post(`${API_BASE_URL}/schedules`, {
+    await ScheduleApiClient.getInstance().updateSchedule({
       attendanceId: data.data.attendanceId,
       attendeeId: data.data.id,
       day: "TUESDAY",
       time: "0930",
     });
   };
-  const fetchRoasterCreate = async (params: RoasterData) => {
-    const {
-      name,
-      age,
-      mobileNumber,
-      subMobileNumber,
-      description,
-      attendanceId,
-    } = params;
-    const response = await axios.post(`${API_BASE_URL}/attendees`, {
-      name: name,
-      age: age,
-      mobileNumber: mobileNumber,
-      subMobileNumber: subMobileNumber,
-      description: description,
-      attendanceId: attendanceId,
-    });
+
+  const fetchRoasterCreate = async () => {
+    const response = await ScheduleApiClient.getInstance().createRoaster(
+      roaster
+    );
     return response;
   };
 
-  const { mutate } = useMutation({
+  const { mutate: roasterCreate } = useMutation({
     mutationKey: ["roaster-list"],
     mutationFn: fetchRoasterCreate,
     onSuccess: (data) => {
       queryClient.invalidateQueries(["roaster-list"]);
       fetchScheduleCreate(data);
-      pushNotification("생성되었습니다.", "success");
+      pushNotification("등록되었습니다.", "success");
       setIsCreate(false);
     },
     onError: () => {
-      pushNotification("생성에 실패하였습니다.", "error");
+      pushNotification("등록에 실패하였습니다.", "error");
       setIsCreate(false);
       setRoaster({
         name: "",
         age: "",
         mobileNumber: "",
         subMobileNumber: "",
-        description: "",
+        description: "33",
         attendanceId: params.id,
       });
     },
@@ -117,8 +115,8 @@ const Index = () => {
   const { isLoading, data: roasterData } = useQuery({
     queryKey: ["roaster-list", params.id],
     queryFn: async () => {
-      const response = await axios.get(
-        `${API_BASE_URL}/attendees/attendanceId/${params.id}`
+      const response = await ScheduleApiClient.getInstance().getRoasterList(
+        params.id
       );
       return response?.data[0];
     },
@@ -140,8 +138,8 @@ const Index = () => {
               <TableRow>
                 <TableCell width={"20%"}>이름</TableCell>
                 <TableCell width={"20%"}>나이</TableCell>
-                <TableCell width={"20%"}>휴대폰번호</TableCell>
-                <TableCell width={"20%"}>서브휴대폰번호</TableCell>
+                <TableCell width={"20%"}>휴대폰 번호</TableCell>
+                <TableCell width={"20%"}>서브 휴대폰 번호</TableCell>
                 <TableCell width={"20%"}>비고</TableCell>
               </TableRow>
             </TableHead>
@@ -176,6 +174,7 @@ const Index = () => {
               <TableRow
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 style={{ cursor: "pointer" }}
+                hover
               >
                 {isCreate ? (
                   <>
@@ -243,9 +242,10 @@ const Index = () => {
                       alignItems: "center",
                       gap: "10px",
                     }}
+                    colSpan={5}
                     onClick={() => setIsCreate(true)}
                   >
-                    <AddIcon /> <p>학생 등록하기</p>
+                    <p>학생 등록하기</p>
                   </TableCell>
                 )}
               </TableRow>
@@ -259,7 +259,11 @@ const Index = () => {
           fullWidth
           maxWidth={false}
         >
-          <ClassScheduleContainer setOpen={setOpen} />
+          <ClassScheduleContainer
+            setOpen={setOpen}
+            schedules={schedules}
+            setSchedules={setSchedules}
+          />
         </Dialog>
         {isCreate ? (
           <div style={{ display: "flex", gap: "10px" }}>
@@ -279,8 +283,11 @@ const Index = () => {
                 variant="contained"
                 color="primary"
                 onClick={() => {
-                  mutate(roaster);
+                  roasterCreate();
                 }}
+                disabled={Object.values(roaster).some(
+                  (value) => value.trim() === ""
+                )}
               >
                 저장
               </Button>

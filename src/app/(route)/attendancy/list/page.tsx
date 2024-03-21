@@ -1,12 +1,13 @@
 "use client";
 
 import { Box, CircularProgress, useMediaQuery, useTheme } from "@mui/material";
+
+import AttendancyApiClient from "@/clients/AttendancyApiClient";
 import BasicLayout from "@/app/components/BasicLayout";
 import CommonTable from "@/app/components/Table";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { API_BASE_URL } from "@/app/utils/common";
 
 const Index = () => {
   const [isCreate, setIsCreate] = useState<boolean>(false);
@@ -14,9 +15,10 @@ const Index = () => {
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const { isLoading, data } = useQuery({
-    queryKey: ["get-user"],
+    queryKey: ["attendancy-list"],
     queryFn: async () => {
-      const response = await axios.get(`${API_BASE_URL}/attendances`);
+      const response =
+        await AttendancyApiClient.getInstance().getAttendanceList();
       return response.data;
     },
   });

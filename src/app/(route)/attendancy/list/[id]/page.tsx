@@ -1,9 +1,18 @@
 "use client";
 
+import "dayjs/locale/ko"; // 한국어 locale 설정
+
+import { API_BASE_URL, accessToken } from "@/app/utils/common";
 import { Box, Button, CircularProgress } from "@mui/material";
 import React, { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useParams, useRouter } from "next/navigation";
+
+import AttendancyApiClient from "@/clients/AttendancyApiClient";
 import BasicLayout from "@/app/components/BasicLayout";
+import { LoadingComponent } from "@/app/components/Loading";
 import Paper from "@mui/material/Paper";
+import RecordApiClient from "@/clients/RecordApiClient";
 // Component
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -11,15 +20,9 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-
-import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { API_BASE_URL, accessToken } from "@/app/utils/common";
-import { pushNotification } from "@/app/utils/notification";
 import dayjs from "dayjs";
-import "dayjs/locale/ko"; // 한국어 locale 설정
-import { LoadingComponent } from "@/app/components/Loading";
+import { pushNotification } from "@/app/utils/notification";
 
 interface DateFormat {
   dateFormat: {
@@ -81,22 +84,23 @@ const index = () => {
   const todayFormatted: DateFormat = getFormattedDate();
   const queryClient = useQueryClient();
   const today = dayjs();
-
+  const [isClient, setIsClient] = useState(false);
   // 오늘의 날짜를 지정된 형식으로 포맷팅
   const todayFormat = today.format("YYYY년 MM월 DD일 (ddd)");
 
   const { data, isLoading } = useQuery({
     queryKey: ["dashboard-data"],
     queryFn: async () => {
-      const response = await axios.get(
-        `${API_BASE_URL}/schedules/attendanceId/${params.id}?days=TUESDAY&days=MONDAY&timeFrom=0900&timeTo=1830`
-      );
+      const response =
+        await AttendancyApiClient.getInstance().getAttendanceDetailList(
+          params.id
+        );
       return response?.data;
     },
   });
 
   const fetchRecord = async (attendeeId: string) =>
-    await axios.post(`${API_BASE_URL}/records`, {
+    await RecordApiClient.getInstance().fetchRecord({
       attendanceId: params.id,
       status: "Present",
       attendeeId: attendeeId,
@@ -106,21 +110,16 @@ const index = () => {
     });
 
   const fetchAllRecord = async () => {
-    await axios
-      .post(`${API_BASE_URL}/records/create`, {
-        attendanceId: params.id,
-        status: "Present",
-        date: new Date(todayFormatted.dateFormat.date),
-        day: todayFormatted.dateFormat.day,
-        lateReason: "",
-      })
-      .then(() => {
-        pushNotification("전원 출석하였습니다", "success");
-        queryClient.invalidateQueries(["dashboard-data"]);
-      });
+    await RecordApiClient.getInstance().fetchAllRecord({
+      attendanceId: params.id,
+      status: "Present",
+      date: new Date(todayFormatted.dateFormat.date),
+      day: todayFormatted.dateFormat.day,
+      lateReason: "",
+    });
   };
 
-  const { mutate } = useMutation(fetchRecord, {
+  const { mutate: recordMutate } = useMutation(fetchRecord, {
     onSuccess: () => {
       pushNotification("출석하였습니다.", "success");
       queryClient.invalidateQueries(["dashboard-data"]);
@@ -129,7 +128,16 @@ const index = () => {
       pushNotification("오류 관리자에게 문의하세요.", "error");
     },
   });
-  const [isClient, setIsClient] = useState(false);
+
+  const { mutate: recordAllMutate } = useMutation(fetchAllRecord, {
+    onSuccess: () => {
+      pushNotification("출석하였습니다.", "success");
+      queryClient.invalidateQueries(["dashboard-data"]);
+    },
+    onError: () => {
+      pushNotification("오류 관리자에게 문의하세요.", "error");
+    },
+  });
 
   useEffect(() => {
     setIsClient(true);
@@ -178,25 +186,34 @@ const index = () => {
                       <TableCell component="th" align="center" scope="row">
                         {item.id}
                       </TableCell>
-                      <TableCell component="th" align="center" scope="row">
+                      <TableCell
+                        component="th"
+                        align="center"
+                        scope="row"
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          gap: "5px",
+                        }}
+                      >
                         <Button
                           variant="outlined"
                           color="primary"
-                          onClick={() => mutate(data.attendeeId)}
+                          onClick={() => recordMutate(data.attendeeId)}
                         >
                           출석
                         </Button>
                         <Button
                           variant="outlined"
                           color="warning"
-                          onClick={() => mutate(data.attendeeId)}
+                          onClick={() => recordMutate(data.attendeeId)}
                         >
                           지각
                         </Button>
                         <Button
                           variant="outlined"
                           color="error"
-                          onClick={() => mutate(data.attendeeId)}
+                          onClick={() => recordMutate(data.attendeeId)}
                         >
                           결석
                         </Button>
@@ -225,7 +242,7 @@ const index = () => {
           variant="contained"
           color="primary"
           onClick={() => {
-            fetchAllRecord();
+            recordAllMutate();
           }}
         >
           전원 출석

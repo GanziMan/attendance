@@ -6,11 +6,10 @@ import * as React from "react";
 import BasicLayout from "@/app/components/BasicLayout";
 // Mui
 import { Button } from "@mui/material";
-import Stack from "@mui/material/Stack";
-import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import Stack from "@mui/material/Stack";
 import { pushNotification } from "@/app/utils/notification";
-import { removeLocalStorage } from "@/libs/client/utils";
+import { useRouter } from "next/navigation";
 
 const index = () => {
   const router = useRouter();
@@ -39,7 +38,6 @@ const index = () => {
           onClick={() => {
             Cookies.remove("ACCESS_TOKEN");
             Cookies.remove("REFRESH_TOKEN");
-            removeLocalStorage("ACCESS_TOKEN");
             pushNotification("로그아웃 되었습니다.", "success");
             router.push("/");
           }}

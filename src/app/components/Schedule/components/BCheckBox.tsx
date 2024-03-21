@@ -1,10 +1,5 @@
-import React, { ChangeEvent } from "react";
 import { Checkbox, FormControlLabel, SxProps, Theme } from "@mui/material";
-import { ReactComponent as ImgCheckedSquare } from "@/public/images/icons/checkbox/checked-square.svg";
-import { ReactComponent as ImgCheckedSquareLined } from "@/public/images/icons/checkbox/checked-square-lined.svg";
-import { ReactComponent as ImgUnCheckedSquare } from "@/public/images/icons/checkbox/unchecked-square.svg";
-import { ReactComponent as ImgCheckedCircle } from "@/public/images/icons/checkbox/checked-circle.svg";
-import { ReactComponent as ImgUnCheckedCircle } from "@/public/images/icons/checkbox/unchecked-circle.svg";
+import React, { ChangeEvent } from "react";
 
 interface IProps {
   text?: string | React.ReactNode;
@@ -28,22 +23,22 @@ export default function BCheckBox({
       control={
         <Checkbox
           checked={checked}
-          icon={
-            iconType === "square" || iconType === "square-lined" ? (
-              <ImgUnCheckedSquare width={24} height={24} />
-            ) : (
-              <ImgUnCheckedCircle width={24} height={24} />
-            )
-          }
-          checkedIcon={
-            iconType === "square-lined" ? (
-              <ImgCheckedSquareLined width={24} height={24} />
-            ) : iconType === "square" ? (
-              <ImgCheckedSquare width={24} height={24} />
-            ) : (
-              <ImgCheckedCircle width={24} height={24} />
-            )
-          }
+          // icon={
+          //   iconType === "square" || iconType === "square-lined" ? (
+          //     <ImgUnCheckedSquare width={24} height={24} />
+          //   ) : (
+          //     <ImgUnCheckedCircle width={24} height={24} />
+          //   )
+          // }
+          // checkedIcon={
+          //   iconType === "square-lined" ? (
+          //     <ImgCheckedSquareLined width={24} height={24} />
+          //   ) : iconType === "square" ? (
+          //     <ImgCheckedSquare width={24} height={24} />
+          //   ) : (
+          //     <ImgCheckedCircle width={24} height={24} />
+          //   )
+          // }
           disabled={disabled}
           onChange={(e: ChangeEvent<HTMLInputElement>) => {
             isCheck(e.target.checked);

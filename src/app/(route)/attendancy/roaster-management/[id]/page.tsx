@@ -124,6 +124,23 @@ const Index = () => {
 
   if (isLoading) return <CircularProgress color="inherit" />;
 
+  const parsingPhoneNumber = (num: string) => {
+    return (
+      num
+        .replace(/[^0-9]/g, "")
+        /**
+         *  0자리 부터 3자리까지 첫번째 '-' 전에 위치
+         *  첫번째 '-'에서 0 자리부터 4자리까지 후에 '-' 위치
+         *  마지막 '-'에서 4자리  숫자
+         */
+        .replace(/^(\d{0,3})(\d{0,4})(\d{0,4})$/g, "$1-$2-$3")
+        /**
+         * '-'기호는 한번에서 두번만 적용
+         */
+        .replace(/(-{1,2})$/g, "")
+        .slice(0, 13)
+    );
+  };
   return (
     <BasicLayout>
       <Box
@@ -203,7 +220,10 @@ const Index = () => {
                         variant="outlined"
                         value={roaster?.mobileNumber}
                         onChange={(e) =>
-                          onChange("mobileNumber", e.target.value)
+                          onChange(
+                            "mobileNumber",
+                            parsingPhoneNumber(e.target.value)
+                          )
                         }
                       />
                     </TableCell>

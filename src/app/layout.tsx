@@ -1,15 +1,19 @@
 "use client";
-import Providers from ".";
+
 import "./globals.css";
-import { useEffect } from "react";
+
+import Cookies from "js-cookie";
+import Providers from ".";
 import { setInterceptor } from "@/libs/client/utils";
+import { useEffect } from "react";
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   useEffect(() => {
-    const token = localStorage.getItem("ACCESS_TOKEN");
+    const token = Cookies.get("ACCESS_TOKEN");
     if (token) {
       setInterceptor(token);
     }

@@ -5,7 +5,7 @@ import Cookies from "js-cookie";
 
 export type Tokens = {
   accessToken: string;
-  refreshToken?: string;
+  refreshToken: string;
 };
 
 class BaseApiClient {
@@ -33,11 +33,6 @@ class BaseApiClient {
 
     this.axios.interceptors.response.use(
       (response) => {
-        if (response.data.code === 4) {
-          return this.refresh(response.config);
-        } else if (response.data.code !== 1) {
-          console.error("API Error", response.data);
-        }
         return response;
       },
       async (error) => {
@@ -59,9 +54,9 @@ class BaseApiClient {
         //   window.location.replace("/error");
         // }
 
-        const accessToken = this.getAccessToken();
+        const accessToken = this.getAccessToken(); // TODO 토큰 처리 해야함
 
-        if (accessToken != null && status === 401) {
+        if (status === 401) {
           // 토큰 만료 혹은 인증 실패 시
           return this.refresh(error.config);
         }
@@ -112,24 +107,20 @@ class BaseApiClient {
           },
         });
 
-        if (refreshResult.data.code === 1) {
-          // 토큰 재발급 성공시
-          if (typeof window !== "undefined") {
-            setTokens({
-              accessToken: refreshResult.data.result.accessToken,
-              refreshToken: refreshResult.data.result.refreshToken,
-            });
-          }
+        // 토큰 재발급 성공시
+        setTokens({
+          accessToken: refreshResult.data.data!.accessToken,
+          refreshToken: refreshResult.data.data!.refreshToken,
+        });
 
-          // 무한 오류에 빠질 수 있음으로 순수한 axios 기본 인스턴스로 재시도한다.
-          return axios.request({
-            ...config,
-            headers: {
-              ...config.headers,
-              Authorization: `Bearer ${refreshResult.data.result.accessToken}`,
-            },
-          });
-        }
+        // 무한 오류에 빠질 수 있음으로 순수한 axios 기본 인스턴스로 재시도한다.
+        return axios.request({
+          ...config,
+          headers: {
+            ...config.headers,
+            Authorization: `Bearer ${refreshResult.data.data!.accessToken}`,
+          },
+        });
       } catch (error) {
         console.error("[Refresh error]", error);
       }
@@ -137,10 +128,10 @@ class BaseApiClient {
 
     // refresh 토큰 없을 시 / 토큰 갱신 실패 시 로그아웃한다.
     if (typeof window !== "undefined") {
-      clearTokens();
-      if (window.location.pathname !== "/") {
-        window.location.replace("/");
-      }
+      // clearTokens();
+      // if (window.location.pathname !== "/") {
+      //   window.location.replace("/");
+      // }
     }
 
     return Promise.reject(new Error("로그인을 연장할 수 없습니다."));

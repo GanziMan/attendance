@@ -18,7 +18,6 @@ export async function safeJwtVerify(accessToken: string | undefined) {
   } catch (error) {
     // SECRET이 맞지 않을 시 등 오류 발생 시 상관 없이 무조건 Null 반환
     console.error(error);
-    console.log("test");
     return null;
   }
 }

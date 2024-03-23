@@ -5,6 +5,7 @@ import { Box, CircularProgress, useMediaQuery, useTheme } from "@mui/material";
 import AttendancyApiClient from "@/clients/AttendancyApiClient";
 import BasicLayout from "@/app/components/BasicLayout";
 import CommonTable from "@/app/components/Table";
+import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
@@ -21,6 +22,7 @@ const Index = () => {
       return response.data;
     },
   });
+  if (isLoading) return <CircularProgress color="inherit" />;
 
   return (
     <BasicLayout>
@@ -34,7 +36,6 @@ const Index = () => {
           infoList={data}
           setIsCreate={setIsCreate}
           isCreate={isCreate}
-          isLoading={isLoading}
         />
       </Box>
     </BasicLayout>

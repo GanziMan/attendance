@@ -118,7 +118,7 @@ const Index = () => {
       const response = await ScheduleApiClient.getInstance().getRoasterList(
         params.id
       );
-      return response?.data[0];
+      return response.data;
     },
   });
 
@@ -141,6 +141,7 @@ const Index = () => {
         .slice(0, 13)
     );
   };
+  console.log(roasterData);
   return (
     <BasicLayout>
       <Box
@@ -161,7 +162,7 @@ const Index = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {roasterData?.map((item: RoasterData, index: number) => (
+              {roasterData?.items.map((item: RoasterData, index: number) => (
                 <TableRow
                   key={index}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}

@@ -176,7 +176,7 @@ const index = () => {
               </TableHead>
               <TableBody>
                 {data ? (
-                  data?.map((item: any) => (
+                  data?.items.map((item: any) => (
                     <TableRow
                       key={item.id}
                       sx={{ "&:last-child td, &:last-child th": { border: 0 } }}

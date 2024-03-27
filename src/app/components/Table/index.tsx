@@ -9,7 +9,11 @@ import {
 } from "@mui/material";
 // Libraries
 import React, { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 import AddIcon from "@mui/icons-material/Add";
 import Cookies from "js-cookie";
@@ -77,7 +81,7 @@ const CommonTable: React.FC<CommonTableProps> = ({
   };
 
   const { mutate } = useMutation(fetchListCreate, {
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClinet.invalidateQueries({ queryKey: ["attendancy-list"] });
       pushNotification("생성 되었습니다.", "success");
       setIsCreate(false);
@@ -118,7 +122,7 @@ const CommonTable: React.FC<CommonTableProps> = ({
           </TableRow>
         </TableHead>
         <TableBody>
-          {infoList?.map((item: Info, index: number) => (
+          {infoList?.items.map((item: Info, index: number) => (
             <TableRow
               key={index}
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}

@@ -1,5 +1,26 @@
 import BaseApiClient, { Tokens } from "./BaseApiClient";
 
+export interface ICommonResponse<T> {
+  code: number;
+  message: string;
+  result?: T;
+}
+
+/**
+ * 페이지 데이터 오브젝트 타입
+ */
+export interface IPage<T> {
+  data: T[];
+  page: number;
+  size: number;
+  totalCount: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+  nextPage?: number;
+  prevPage?: number;
+}
+
 class AttendancyApiClient extends BaseApiClient {
   private static instance: AttendancyApiClient;
 
@@ -15,7 +36,7 @@ class AttendancyApiClient extends BaseApiClient {
   }
 
   public getAttendanceList = () =>
-    this.axios.request({
+    this.axios.request<ICommonResponse<IPage<any>>>({
       method: "GET",
       url: "/attendances",
     });

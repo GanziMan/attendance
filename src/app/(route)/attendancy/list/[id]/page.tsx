@@ -4,12 +4,19 @@ import "dayjs/locale/ko"; // 한국어 locale 설정
 
 import { API_BASE_URL, accessToken } from "@/app/utils/common";
 import { Box, Button, CircularProgress } from "@mui/material";
+import {
+  QueryClient,
+  dehydrate,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 
 import AttendancyApiClient from "@/clients/AttendancyApiClient";
 import BasicLayout from "@/app/components/BasicLayout";
+import { GetServerSideProps } from "next";
 import { LoadingComponent } from "@/app/components/Loading";
 import Paper from "@mui/material/Paper";
 import RecordApiClient from "@/clients/RecordApiClient";
@@ -274,3 +281,17 @@ const index = () => {
 };
 
 export default index;
+
+// SSR DataPrefetch 기능
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const queryClient = new QueryClient();
+  const id = context.params!.id as string;
+
+  console.log(id);
+  // await queryClient.prefetchQuery([""],id), () =>
+  return {
+    props: {
+      dehydratedState: dehydrate(queryClient),
+    },
+  };
+};

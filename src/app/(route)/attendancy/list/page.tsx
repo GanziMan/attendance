@@ -1,12 +1,12 @@
 "use client";
 
 import { Box, useMediaQuery, useTheme } from "@mui/material";
-import { useEffect, useState } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 
 import AttendancyApiClient from "@/clients/AttendancyApiClient";
 import BasicLayout from "@/app/components/BasicLayout";
 import CommonTable from "@/app/components/Table";
+import { useState } from "react";
 
 const Index = () => {
   const [isCreate, setIsCreate] = useState<boolean>(false);
@@ -22,7 +22,7 @@ const Index = () => {
     },
   });
 
-  const { data, hasNextPage } = useInfiniteQuery({
+  const {} = useInfiniteQuery({
     queryKey: ["attendancy-list"],
     queryFn: async ({ pageParam }) =>
       await AttendancyApiClient.getInstance().getAttendanceList(),
@@ -52,3 +52,6 @@ const Index = () => {
 };
 
 export default Index;
+
+
+

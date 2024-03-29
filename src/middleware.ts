@@ -33,6 +33,7 @@ export default async function handler(req: NextRequest) {
 
   // 토큰 만료시 (refresh)
   const decoded = await safeJwtDecode(String(accessToken?.value));
+
   if (decoded?.exp != null && decoded.exp * 1000 <= Date.now()) {
     if (refreshToken != null) {
       try {
@@ -73,9 +74,9 @@ export default async function handler(req: NextRequest) {
     const res = NextResponse.next({
       request: req,
     });
-    // 토큰을 cookie에서 삭제한다.
-    res.cookies.delete(ACCESS_TOKEN_KEY);
-    res.cookies.delete(REFRESH_TOKEN_KEY);
+    // // 토큰을 cookie에서 삭제한다.
+    // res.cookies.delete(ACCESS_TOKEN_KEY);
+    // res.cookies.delete(REFRESH_TOKEN_KEY);
     return res;
   }
 
